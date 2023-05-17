@@ -1,0 +1,279 @@
+{% extends 'administrator/master.html' %} {% block head %}
+
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
+<style>
+    input {
+        padding: 0;
+        margin: 0;
+        outline: none;
+        font-family: Roboto, Arial, sans-serif;
+        font-size: 14px;
+        color: #666;
+        line-height: 22px;
+    }
+
+    h1,
+    h4 {
+        font-weight: 400;
+    }
+
+    h4 {
+        margin: 22px 0 4px;
+    }
+
+    h5 {
+        text-transform: uppercase;
+        color: #095484;
+    }
+
+    .main-block {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 3px;
+    }
+
+    form {
+        width: 80%;
+        padding: 20px;
+        box-shadow: 0 2px 5px #ccc;
+        background: #fff;
+    }
+
+    input,
+    select {
+        width: calc(100% - 10px);
+        padding: 5px;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+        vertical-align: middle;
+    }
+
+    textarea {
+        width: calc(100% - 6px);
+        outline: none;
+    }
+
+    input:hover,
+    textarea:hover {
+        outline: none;
+        border: 1px solid #095484;
+    }
+
+    .additional-question th,
+    .additional-question td {
+        width: 38%;
+    }
+
+    .course-rate th,
+    .course-rate td {
+        width: 19%;
+    }
+
+    .first-col,
+    .additional-question .first-col,
+    .course-rate .first-col {
+        width: 24%;
+        text-align: left;
+    }
+
+    .question,
+    .comments {
+        margin: 15px 0 5px;
+    }
+
+    .question-answer label {
+        display: inline-block;
+        padding: 0 20px 15px 0;
+    }
+
+    .question-answer input {
+        width: auto;
+    }
+
+    .question-answer,
+    table {
+        width: 100%;
+    }
+
+    .btn-block {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    button {
+        width: 150px;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background: #095484;
+        font-size: 16px;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #0666a3;
+    }
+
+    @media (min-width: 568px) {
+        th,
+        td {
+            word-break: keep-all;
+        }
+    }
+        /* The Modal (background) */
+
+.popup .overlay {
+  position:fixed;
+  top:0px;
+  left:0px;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.7);
+  z-index:1;
+  display:none;
+}
+
+.popup .content {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  background:#fff;
+  width:50%;
+  height:30%;
+  z-index:2;
+  text-align:center;
+  padding:20px;
+  box-sizing:border-box;
+  font-family:"Open Sans",sans-serif;
+}
+
+.popup .close-btn {
+  cursor:pointer;
+  position:absolute;
+  right:0;
+  top:0;
+  width:30px;
+  height:30px;
+  background:#222;
+  color:#fff;
+  font-size:25px;
+  font-weight:600;
+  line-height:30px;
+  text-align:center;
+  border-radius:50%;
+}
+
+.popup.active .overlay {
+  display:block;
+}
+
+.popup.active .content {
+  transition:all 300ms ease-in-out;
+  transform:translate(-50%,-50%) scale(1);
+}
+
+h2 {
+        font-weight: 400;
+        color: #1c87c9;
+}
+/* end of model style */
+
+</style>
+{% endblock %}
+{% block section %}
+<div class="main-block" id="nompaper">
+    <form method="POST">
+        {% csrf_token %}
+        <h1>Student Organization Approval</h1><br>
+        {% for p in party %}
+            <table>
+
+
+                <tr>
+                    <th>Name</th>
+                        <td>{{p.party_name}}</td>
+
+                </tr>
+
+                <tr>
+                    <th>Lead by</th>
+                    <td>
+                        <table>
+
+                                {% for s in stud %}
+                                    {% ifequal p.support_id_id s.stud_id %}
+                            <tr>
+                                <td><img src="{{ s.stud_photo.url }}" alt="hi" ></td>
+                            </tr>
+
+                            <tr>
+
+                                    {% if s.stud_mname %}
+                                        <td>{{s.stud_fname}} {{s.stud_mname}} {{s.stud_lname}}</td>
+                                        {% else %}
+                                        <td>{{s.stud_fname}} {{s.stud_lname}}</td>
+                                    {% endif %}
+                            </tr>
+
+                            <tr>
+                                    {% for c in course %}
+                                    {% ifequal c.course_id s.stud_course_id_id %}
+                                        <td>{{c.course_name}}</td>
+                                    {% endifequal %}
+                                    {% endfor %}
+                            </tr>
+
+                            <tr>
+
+                                     {% for d in dept %}
+                                       {% ifequal d.dept_id  s.dept_id_id  %}
+                                        <td>{{d.dept_name}}</td>
+                                        {% endifequal %}
+                                    {% endfor %}
+                            </tr>
+                                 {% endifequal %}
+                                {% endfor %}
+
+                        </table>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td colspan="2">
+                    <div class="btn-block">
+                        <button type="submit" name="approve" value={{p.party_id}}>Approve</button>
+                     </div>
+                    </td>
+                </tr>
+            </table><br><br>
+        {% endfor %}
+
+<!-- The Modal -->
+<div class="popup" id="popup-1">
+  <div class="overlay"></div>
+  <div class="content">
+    <div class="close-btn" onclick="togglePopup()">&times;</div>
+    <h2 align="left">Message</h2>
+    <span id="popupMsg"></span>
+  </div>
+</div>
+
+    </form>
+</div>
+{% endblock section %}
+
+{% block script %}
+
+<script>
+
+    $(function() {
+        $(document).scrollTop($("#dataForm").offset().top);
+    });
+
+</script>
+
+{% endblock %}
